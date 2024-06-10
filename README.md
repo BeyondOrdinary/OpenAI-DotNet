@@ -151,13 +151,13 @@ You use the `OpenAIAuthentication` when you initialize the API as shown:
 > We recommended using the environment variables to load the API key instead of having it hard coded in your source. It is not recommended use this method in production, but only for accepting user credentials, local testing and quick start scenarios.
 
 ```csharp
-using var api = new OpenAIClient("sk-apiKey");
+var api = new OpenAIClient("sk-apiKey");
 ```
 
 Or create a `OpenAIAuthentication` object manually
 
 ```csharp
-using var api = new OpenAIClient(new OpenAIAuthentication("sk-apiKey", "org-yourOrganizationId", "proj_yourProjectId"));
+var api = new OpenAIClient(new OpenAIAuthentication("sk-apiKey", "org-yourOrganizationId", "proj_yourProjectId"));
 ```
 
 #### Load key from configuration file
@@ -192,13 +192,13 @@ You can also load the configuration file directly with known path by calling sta
 - Loads the default `.openai` config in the specified directory:
 
 ```csharp
-using var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("path/to/your/directory"));
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("path/to/your/directory"));
 ```
 
 - Loads the configuration file from a specific path. File does not need to be named `.openai` as long as it conforms to the json format:
 
 ```csharp
-using var api = new OpenAIClient(OpenAIAuthentication.LoadFromPath("path/to/your/file.json"));
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromPath("path/to/your/file.json"));
 ```
 
 #### Use System Environment Variables
@@ -210,7 +210,7 @@ Use your system's environment variables specify an api key and organization to u
 - Use `OPENAI_PROJECT_ID` to specify a project.
 
 ```csharp
-using var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
 ```
 
 ### Handling OpenAIClient and HttpClient Lifecycle
@@ -225,13 +225,13 @@ Please ensure to appropriately dispose of `OpenAIClient` to release resources ti
 Typical usage with an internal `HttpClient`:
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 ```
 
 Custom `HttpClient` (which you must dispose of yourself):
 
 ```csharp
-using var customHttpClient = new HttpClient();
+var customHttpClient = new HttpClient();
 // set custom http client properties here
 var api = new OpenAIClient(client: customHttpClient);
 ```
@@ -255,7 +255,7 @@ To setup the client to use your deployment, you'll need to pass in `OpenAIClient
 ```csharp
 var auth = new OpenAIAuthentication("sk-apiKey");
 var settings = new OpenAIClientSettings(resourceName: "your-resource-name", deploymentId: "deployment-id", apiVersion: "api-version");
-using var api = new OpenAIClient(auth, settings);
+var api = new OpenAIClient(auth, settings);
 ```
 
 #### [Azure Active Directory Authentication](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/reference#authentication)
@@ -269,7 +269,7 @@ using var api = new OpenAIClient(auth, settings);
 var accessToken = result.AccessToken;
 var auth = new OpenAIAuthentication(accessToken);
 var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "deployment-id", apiVersion: "api-version", useActiveDirectoryAuthentication: true);
-using var api = new OpenAIClient(auth, settings);
+var api = new OpenAIClient(auth, settings);
 ```
 
 ### [OpenAI API Proxy](OpenAI-DotNet-Proxy/Readme.md)
@@ -296,7 +296,7 @@ Here's an example of how to set up the front end:
 var authToken = await LoginAsync();
 var auth = new OpenAIAuthentication($"sess-{authToken}");
 var settings = new OpenAIClientSettings(domain: "api.your-custom-domain.com");
-using var api = new OpenAIClient(auth, settings);
+var api = new OpenAIClient(auth, settings);
 ```
 
 This setup allows your front end application to securely communicate with your backend that will be using the OpenAI-DotNet-Proxy, which then forwards requests to the OpenAI API. This ensures that your OpenAI API keys and other sensitive information remain secure throughout the process.
@@ -345,7 +345,7 @@ public partial class Program
     {
         var auth = OpenAIAuthentication.LoadFromEnv();
         var settings = new OpenAIClientSettings(/* your custom settings if using Azure OpenAI */);
-        using var openAIClient = new OpenAIClient(auth, settings);
+        var openAIClient = new OpenAIClient(auth, settings);
         OpenAIProxyStartup.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
     }
 }
@@ -372,7 +372,7 @@ The Models API is accessed via `OpenAIClient.ModelsEndpoint`
 Lists the currently available models, and provides basic information about each one such as the owner and availability.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var models = await api.ModelsEndpoint.GetModelsAsync();
 
 foreach (var model in models)
@@ -386,7 +386,7 @@ foreach (var model in models)
 Retrieves a model instance, providing basic information about the model such as the owner and permissions.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var model = await api.ModelsEndpoint.GetModelDetailsAsync("gpt-4o");
 Console.WriteLine(model.ToString());
 ```
@@ -396,7 +396,7 @@ Console.WriteLine(model.ToString());
 Delete a fine-tuned model. You must have the Owner role in your organization.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isDeleted = await api.ModelsEndpoint.DeleteFineTuneModelAsync("your-fine-tuned-model");
 Assert.IsTrue(isDeleted);
 ```
@@ -418,7 +418,7 @@ The Assistants API is accessed via `OpenAIClient.AssistantsEndpoint`
 Returns a list of assistants.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var assistantsList = await api.AssistantsEndpoint.ListAssistantsAsync();
 
 foreach (var assistant in assistantsList.Items)
@@ -432,7 +432,7 @@ foreach (var assistant in assistantsList.Items)
 Create an assistant with a model and instructions.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var request = new CreateAssistantRequest(Model.GPT4o);
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(request);
 ```
@@ -442,7 +442,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(request);
 Retrieves an assistant.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var assistant = await api.AssistantsEndpoint.RetrieveAssistantAsync("assistant-id");
 Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
 ```
@@ -452,7 +452,7 @@ Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
 Modifies an assistant.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var createRequest = new CreateAssistantRequest(Model.GPT4_Turbo);
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
 var modifyRequest = new CreateAssistantRequest(Model.GPT4o);
@@ -466,7 +466,7 @@ var modifiedAssistantEx = await assistant.ModifyAsync(modifyRequest);
 Delete an assistant.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isDeleted = await api.AssistantsEndpoint.DeleteAssistantAsync("assistant-id");
 // OR AssistantExtension for easier use!
 var isDeleted = await assistant.DeleteAsync();
@@ -489,7 +489,7 @@ The Threads API is accessed via `OpenAIClient.ThreadsEndpoint`
 Create a thread.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 Console.WriteLine($"Create thread {thread.Id} -> {thread.CreatedAt}");
 ```
@@ -501,7 +501,7 @@ Create a thread and run it in one request.
 > See also: [Thread Runs](#thread-runs)
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
@@ -518,7 +518,7 @@ Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.C
 Create a thread and run it in one request while streaming events.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var tools = new List<Tool>
 {
     Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
@@ -566,7 +566,7 @@ foreach (var response in messages.Items.Reverse())
 Retrieves a thread.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var thread = await api.ThreadsEndpoint.RetrieveThreadAsync("thread-id");
 // OR if you simply wish to get the latest state of a thread
 thread = await thread.UpdateAsync();
@@ -580,7 +580,7 @@ Modifies a thread.
 > Note: Only the metadata can be modified.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 var metadata = new Dictionary<string, string>
 {
@@ -597,7 +597,7 @@ Console.WriteLine($"Modify thread {thread.Id} -> {thread.Metadata["key"]}");
 Delete a thread.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isDeleted = await api.ThreadsEndpoint.DeleteThreadAsync("thread-id");
 // OR use extension method for convenience!
 var isDeleted = await thread.DeleteAsync();
@@ -613,7 +613,7 @@ Create messages within threads.
 Returns a list of messages for a given thread.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var messageList = await api.ThreadsEndpoint.ListMessagesAsync("thread-id");
 // OR use extension method for convenience!
 var messageList = await thread.ListMessagesAsync();
@@ -629,7 +629,7 @@ foreach (var message in messageList.Items)
 Create a message.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 var request = new CreateMessageRequest("Hello world!");
 var message = await api.ThreadsEndpoint.CreateMessageAsync(thread.Id, request);
@@ -643,7 +643,7 @@ Console.WriteLine($"{message.Id}: {message.Role}: {message.PrintContent()}");
 Retrieve a message.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var message = await api.ThreadsEndpoint.RetrieveMessageAsync("thread-id", "message-id");
 // OR use extension methods for convenience!
 var message = await thread.RetrieveMessageAsync("message-id");
@@ -658,7 +658,7 @@ Modify a message.
 > Note: Only the message metadata can be modified.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var metadata = new Dictionary<string, string>
 {
     { "key", "custom message metadata" }
@@ -678,7 +678,7 @@ Represents an execution run on a thread.
 Returns a list of runs belonging to a thread.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var runList = await api.ThreadsEndpoint.ListRunsAsync("thread-id");
 // OR use extension method for convenience!
 var runList = await thread.ListRunsAsync();
@@ -694,7 +694,7 @@ foreach (var run in runList.Items)
 Create a run.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
@@ -711,7 +711,7 @@ Console.WriteLine($"[{run.Id}] {run.Status} | {run.CreatedAt}");
 Create a run and stream the events.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
@@ -737,7 +737,7 @@ foreach (var response in messages.Items.Reverse())
 Retrieves a run.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var run = await api.ThreadsEndpoint.RetrieveRunAsync("thread-id", "run-id");
 // OR use extension method for convenience!
 var run = await thread.RetrieveRunAsync("run-id");
@@ -752,7 +752,7 @@ Modifies a run.
 > Note: Only the metadata can be modified.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var metadata = new Dictionary<string, string>
 {
     { "key", "custom run metadata" }
@@ -772,7 +772,7 @@ All outputs must be submitted in a single request.
 > See [Create Thread and Run Streaming](#create-thread-and-run-streaming) example on how to stream tool output events.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var tools = new List<Tool>
 {
     // Use a predefined tool
@@ -815,7 +815,7 @@ foreach (var message in messages.Items.OrderBy(response => response.CreatedAt))
 Returns a list of run steps belonging to a run.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var runStepList = await api.ThreadsEndpoint.ListRunStepsAsync("thread-id", "run-id");
 // OR use extension method for convenience!
 var runStepList = await run.ListRunStepsAsync();
@@ -831,7 +831,7 @@ foreach (var runStep in runStepList.Items)
 Retrieves a run step.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var runStep = await api.ThreadsEndpoint.RetrieveRunStepAsync("thread-id", "run-id", "step-id");
 // OR use extension method for convenience!
 var runStep = await run.RetrieveRunStepAsync("step-id");
@@ -844,7 +844,7 @@ Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runS
 Cancels a run that is `in_progress`.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isCancelled = await api.ThreadsEndpoint.CancelRunAsync("thread-id", "run-id");
 // OR use extension method for convenience!
 var isCancelled = await run.CancelAsync();
@@ -864,7 +864,7 @@ The Vector Stores API is accessed via `OpenAIClient.VectorStoresEndpoint`
 Returns a list of vector stores.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var vectorStores = await OpenAIClient.VectorStoresEndpoint.ListVectorStoresAsync();
 
 foreach (var vectorStore in vectorStores.Items)
@@ -878,7 +878,7 @@ foreach (var vectorStore in vectorStores.Items)
 Create a vector store.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var createVectorStoreRequest = new CreateVectorStoreRequest("test-vector-store");
 var vectorStore = await api.VectorStoresEndpoint.CreateVectorStoreAsync(createVectorStoreRequest);
 Console.WriteLine(vectorStore);
@@ -889,7 +889,7 @@ Console.WriteLine(vectorStore);
 Retrieves a vector store.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var vectorStore = await api.VectorStoresEndpoint.GetVectorStoreAsync("vector-store-id");
 Console.WriteLine(vectorStore);
 ```
@@ -899,7 +899,7 @@ Console.WriteLine(vectorStore);
 Modifies a vector store.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var metadata = new Dictionary<string, object> { { "Test", DateTime.UtcNow } };
 var vectorStore = await api.VectorStoresEndpoint.ModifyVectorStoreAsync("vector-store-id", metadata: metadata);
 Console.WriteLine(vectorStore);
@@ -910,7 +910,7 @@ Console.WriteLine(vectorStore);
 Delete a vector store.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isDeleted = await api.VectorStoresEndpoint.DeleteVectorStoreAsync("vector-store-id");
 Assert.IsTrue(isDeleted);
 ```
@@ -926,7 +926,7 @@ Vector store files represent files inside a vector store.
 Returns a list of vector store files.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var files = await api.VectorStoresEndpoint.ListVectorStoreFilesAsync("vector-store-id");
 
 foreach (var file in vectorStoreFiles.Items)
@@ -940,7 +940,7 @@ foreach (var file in vectorStoreFiles.Items)
 Create a vector store file by attaching a file to a vector store.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var file = await api.VectorStoresEndpoint.CreateVectorStoreFileAsync("vector-store-id", "file-id", new ChunkingStrategy(ChunkingStrategyType.Static));
 Console.WriteLine(file);
 ```
@@ -950,7 +950,7 @@ Console.WriteLine(file);
 Retrieves a vector store file.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var file = await api.VectorStoresEndpoint.GetVectorStoreFileAsync("vector-store-id", "vector-store-file-id");
 Console.WriteLine(file);
 ```
@@ -960,7 +960,7 @@ Console.WriteLine(file);
 Delete a vector store file. This will remove the file from the vector store but the file itself will not be deleted. To delete the file, use the delete file endpoint.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isDeleted = await api.VectorStoresEndpoint.DeleteVectorStoreFileAsync("vector-store-id", vectorStoreFile);
 Assert.IsTrue(isDeleted);
 ```
@@ -976,7 +976,7 @@ Vector store files represent files inside a vector store.
 Create a vector store file batch.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var files = new List<string> { "file_id_1","file_id_2" };
 var vectorStoreFileBatch = await api.VectorStoresEndpoint.CreateVectorStoreFileBatchAsync("vector-store-id", files);
 Console.WriteLine(vectorStoreFileBatch);
@@ -987,7 +987,7 @@ Console.WriteLine(vectorStoreFileBatch);
 Retrieves a vector store file batch.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var vectorStoreFileBatch = await api.VectorStoresEndpoint.GetVectorStoreFileBatchAsync("vector-store-id", "vector-store-file-batch-id");
 // you can also use convenience methods!
 vectorStoreFileBatch = await vectorStoreFileBatch.UpdateAsync();
@@ -999,7 +999,7 @@ vectorStoreFileBatch = await vectorStoreFileBatch.WaitForStatusChangeAsync();
 Returns a list of vector store files in a batch.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var files = await api.VectorStoresEndpoint.ListVectorStoreBatchFilesAsync("vector-store-id", "vector-store-file-batch-id");
 
 foreach (var file in files.Items)
@@ -1013,7 +1013,7 @@ foreach (var file in files.Items)
 Cancel a vector store file batch. This attempts to cancel the processing of files in this batch as soon as possible.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isCancelled = await api.VectorStoresEndpoint.CancelVectorStoreFileBatchAsync("vector-store-id", "vector-store-file-batch-id");
 ```
 
@@ -1028,7 +1028,7 @@ The Chat API is accessed via `OpenAIClient.ChatEndpoint`
 Creates a completion for the chat message
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var messages = new List<Message>
 {
     new Message(Role.System, "You are a helpful assistant."),
@@ -1045,7 +1045,7 @@ Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | F
 #### [Chat Streaming](https://platform.openai.com/docs/api-reference/chat/create#chat/create-stream)
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var messages = new List<Message>
 {
     new Message(Role.System, "You are a helpful assistant."),
@@ -1065,7 +1065,7 @@ Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | F
 Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var messages = new List<Message>
 {
     new Message(Role.System, "You are a helpful assistant."),
@@ -1089,7 +1089,7 @@ Console.WriteLine(cumulativeDelta);
 #### [Chat Tools](https://platform.openai.com/docs/guides/function-calling)
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var messages = new List<Message>
 {
     new(Role.System, "You are a helpful weather assistant. Always prompt the user for their location."),
@@ -1165,7 +1165,7 @@ foreach (var toolCall in response.FirstChoice.Message.ToolCalls)
 > Beta Feature. API subject to breaking changes.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var messages = new List<Message>
 {
     new Message(Role.System, "You are a helpful assistant."),
@@ -1219,7 +1219,7 @@ The Audio API is accessed via `OpenAIClient.AudioEndpoint`
 Generates audio from the input text.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var request = new SpeechRequest("Hello World!");
 async Task ChunkCallback(ReadOnlyMemory<byte> chunkCallback)
 {
@@ -1236,8 +1236,8 @@ await File.WriteAllBytesAsync("../../../Assets/HelloWorld.mp3", response.ToArray
 Transcribes audio into the input language.
 
 ```csharp
-using var api = new OpenAIClient();
-using var request = new AudioTranscriptionRequest(Path.GetFullPath(audioAssetPath), language: "en");
+var api = new OpenAIClient();
+var request = new AudioTranscriptionRequest(Path.GetFullPath(audioAssetPath), language: "en");
 var response = await api.AudioEndpoint.CreateTranscriptionTextAsync(request);
 Console.WriteLine(response);
 ```
@@ -1245,8 +1245,8 @@ Console.WriteLine(response);
 You can also get detailed information using `verbose_json` to get timestamp granularities:
 
 ```csharp
-using var api = new OpenAIClient();
-using var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Verbose_Json, timestampGranularity: TimestampGranularity.Word, temperature: 0.1f, language: "en");
+var api = new OpenAIClient();
+var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Verbose_Json, timestampGranularity: TimestampGranularity.Word, temperature: 0.1f, language: "en");
 var response = await api.AudioEndpoint.CreateTranscriptionTextAsync(request);
 
 foreach (var word in response.Words)
@@ -1260,8 +1260,8 @@ foreach (var word in response.Words)
 Translates audio into into English.
 
 ```csharp
-using var api = new OpenAIClient();
-using var request = new AudioTranslationRequest(Path.GetFullPath(audioAssetPath));
+var api = new OpenAIClient();
+var request = new AudioTranslationRequest(Path.GetFullPath(audioAssetPath));
 var response = await api.AudioEndpoint.CreateTranslationTextAsync(request);
 Console.WriteLine(response);
 ```
@@ -1277,7 +1277,7 @@ The Images API is accessed via `OpenAIClient.ImagesEndpoint`
 Creates an image given a prompt.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_3);
 var imageResults = await api.ImagesEndPoint.GenerateImageAsync(request);
 
@@ -1293,7 +1293,7 @@ foreach (var image in imageResults)
 Creates an edited or extended image given an original image and a prompt.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small);
 var imageResults = await api.ImagesEndPoint.CreateImageEditAsync(request);
 
@@ -1309,7 +1309,7 @@ foreach (var image in imageResults)
 Creates a variation of a given image.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small);
 var imageResults = await api.ImagesEndPoint.CreateImageVariationAsync(request);
 
@@ -1331,7 +1331,7 @@ The Files API is accessed via `OpenAIClient.FilesEndpoint`
 Returns a list of files that belong to the user's organization.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var fileList = await api.FilesEndpoint.ListFilesAsync();
 
 foreach (var file in fileList)
@@ -1347,7 +1347,7 @@ Upload a file that can be used across various endpoints. The size of all the fil
 The size of individual files can be a maximum of 512 MB. See the Assistants Tools guide to learn more about the types of files supported. The Fine-tuning API only supports .jsonl files.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var file = await api.FilesEndpoint.UploadFileAsync("path/to/your/file.jsonl", FilePurpose.FineTune);
 Console.WriteLine(file.Id);
 ```
@@ -1357,7 +1357,7 @@ Console.WriteLine(file.Id);
 Delete a file.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isDeleted = await api.FilesEndpoint.DeleteFileAsync(fileId);
 Assert.IsTrue(isDeleted);
 ```
@@ -1367,7 +1367,7 @@ Assert.IsTrue(isDeleted);
 Returns information about a specific file.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var file = await  api.FilesEndpoint.GetFileInfoAsync(fileId);
 Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} bytes");
 ```
@@ -1377,7 +1377,7 @@ Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} by
 Downloads the file content to the specified directory.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var downloadedFilePath = await api.FilesEndpoint.DownloadFileAsync(fileId, "path/to/your/save/directory");
 Console.WriteLine(downloadedFilePath);
 Assert.IsTrue(File.Exists(downloadedFilePath));
@@ -1398,7 +1398,7 @@ Creates a job that fine-tunes a specified model from a given dataset.
 Response includes details of the enqueued job including job status and the name of the fine-tuned models once complete.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var fileId = "file-abc123";
 var request = new CreateFineTuneRequest(fileId);
 var job = await api.FineTuningEndpoint.CreateJobAsync(Model.GPT3_5_Turbo, request);
@@ -1410,7 +1410,7 @@ Console.WriteLine($"Started {job.Id} | Status: {job.Status}");
 List your organization's fine-tuning jobs.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var jobList = await api.FineTuningEndpoint.ListJobsAsync();
 
 foreach (var job in jobList.Items.OrderByDescending(job => job.CreatedAt))
@@ -1424,7 +1424,7 @@ foreach (var job in jobList.Items.OrderByDescending(job => job.CreatedAt))
 Gets info about the fine-tune job.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var job = await api.FineTuningEndpoint.GetJobInfoAsync(fineTuneJob);
 Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
 ```
@@ -1434,7 +1434,7 @@ Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
 Immediately cancel a fine-tune job.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isCancelled = await api.FineTuningEndpoint.CancelFineTuneJobAsync(fineTuneJob);
 Assert.IsTrue(isCancelled);
 ```
@@ -1444,7 +1444,7 @@ Assert.IsTrue(isCancelled);
 Get status updates for a fine-tuning job.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var eventList = await api.FineTuningEndpoint.ListJobEventsAsync(fineTuneJob);
 Console.WriteLine($"{fineTuneJob.Id} -> status: {fineTuneJob.Status} | event count: {eventList.Events.Count}");
 
@@ -1467,7 +1467,7 @@ The Batches API is accessed via `OpenAIClient.BatchesEndpoint`
 List your organization's batches.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var batches = await api.await OpenAIClient.BatchEndpoint.ListBatchesAsync();
 
 foreach (var batch in listResponse.Items)
@@ -1481,7 +1481,7 @@ foreach (var batch in listResponse.Items)
 Creates and executes a batch from an uploaded file of requests
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var batchRequest = new CreateBatchRequest("file-id", Endpoint.ChatCompletions);
 var batch = await api.BatchEndpoint.CreateBatchAsync(batchRequest);
 ```
@@ -1491,7 +1491,7 @@ var batch = await api.BatchEndpoint.CreateBatchAsync(batchRequest);
 Retrieves a batch.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var batch = await api.BatchEndpoint.RetrieveBatchAsync("batch-id");
 // you can also use convenience methods!
 batch = await batch.UpdateAsync();
@@ -1503,7 +1503,7 @@ batch = await batch.WaitForStatusChangeAsync();
 Cancels an in-progress batch. The batch will be in status cancelling for up to 10 minutes, before changing to cancelled, where it will have partial results (if any) available in the output file.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isCancelled = await api.BatchEndpoint.CancelBatchAsync(batch);
 Assert.IsTrue(isCancelled);
 ```
@@ -1521,7 +1521,7 @@ The Edits API is accessed via `OpenAIClient.EmbeddingsEndpoint`
 Creates an embedding vector representing the input text.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var response = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", Models.Embedding_Ada_002);
 Console.WriteLine(response);
 ```
@@ -1539,7 +1539,7 @@ The Moderations API can be accessed via `OpenAIClient.ModerationsEndpoint`
 Classifies if text violates OpenAI's Content Policy.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var isViolation = await api.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
 Assert.IsTrue(isViolation);
 ```
@@ -1547,7 +1547,7 @@ Assert.IsTrue(isViolation);
 Additionally you can also get the scores of a given input.
 
 ```csharp
-using var api = new OpenAIClient();
+var api = new OpenAIClient();
 var response = await api.ModerationsEndpoint.CreateModerationAsync(new ModerationsRequest("I love you"));
 Assert.IsNotNull(response);
 Console.WriteLine(response.Results?[0]?.Scores?.ToString());

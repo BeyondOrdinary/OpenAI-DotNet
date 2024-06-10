@@ -13,7 +13,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<TruncationStrategies>))]
+        [JsonConverter(typeof(CustomJsonStringEnumConverter<TruncationStrategies>))]
         public TruncationStrategies Type { get; private set; }
 
         /// <summary>

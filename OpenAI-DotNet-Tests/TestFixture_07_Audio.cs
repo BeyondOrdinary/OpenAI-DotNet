@@ -15,7 +15,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var transcriptionAudio = Path.GetFullPath("../../../Assets/T3mt39YrlyLoq8laHSdf.mp3");
-            using var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Text, temperature: 0.1f, language: "en");
+            var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Text, temperature: 0.1f, language: "en");
             var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionTextAsync(request);
             Assert.IsNotNull(response);
         }
@@ -25,7 +25,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var transcriptionAudio = Path.GetFullPath("../../../Assets/T3mt39YrlyLoq8laHSdf.mp3");
-            using var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Json, temperature: 0.1f, language: "en");
+            var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Json, temperature: 0.1f, language: "en");
             var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionTextAsync(request);
             Assert.IsNotNull(response);
         }
@@ -35,7 +35,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var transcriptionAudio = Path.GetFullPath("../../../Assets/T3mt39YrlyLoq8laHSdf.mp3");
-            using var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Verbose_Json, temperature: 0.1f, language: "en");
+            var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Verbose_Json, temperature: 0.1f, language: "en");
             var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionJsonAsync(request);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Duration);
@@ -49,7 +49,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var transcriptionAudio = Path.GetFullPath("../../../Assets/T3mt39YrlyLoq8laHSdf.mp3");
-            using var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Verbose_Json, timestampGranularity: TimestampGranularity.Word, temperature: 0.1f, language: "en");
+            var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Verbose_Json, timestampGranularity: TimestampGranularity.Word, temperature: 0.1f, language: "en");
             var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionJsonAsync(request);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Duration);
@@ -63,7 +63,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var translationAudio = Path.GetFullPath("../../../Assets/Ja-botchan_1-1_1-2.mp3");
-            using var request = new AudioTranslationRequest(Path.GetFullPath(translationAudio), responseFormat: AudioResponseFormat.Text);
+            var request = new AudioTranslationRequest(Path.GetFullPath(translationAudio), responseFormat: AudioResponseFormat.Text);
             var response = await OpenAIClient.AudioEndpoint.CreateTranslationTextAsync(request);
             Assert.IsNotNull(response);
         }
@@ -73,7 +73,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var translationAudio = Path.GetFullPath("../../../Assets/Ja-botchan_1-1_1-2.mp3");
-            using var request = new AudioTranslationRequest(Path.GetFullPath(translationAudio), responseFormat: AudioResponseFormat.Json);
+            var request = new AudioTranslationRequest(Path.GetFullPath(translationAudio), responseFormat: AudioResponseFormat.Json);
             var response = await OpenAIClient.AudioEndpoint.CreateTranslationJsonAsync(request);
             Assert.IsNotNull(response);
         }
@@ -83,7 +83,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var translationAudio = Path.GetFullPath("../../../Assets/Ja-botchan_1-1_1-2.mp3");
-            using var request = new AudioTranslationRequest(Path.GetFullPath(translationAudio), responseFormat: AudioResponseFormat.Verbose_Json);
+            var request = new AudioTranslationRequest(Path.GetFullPath(translationAudio), responseFormat: AudioResponseFormat.Verbose_Json);
             var response = await OpenAIClient.AudioEndpoint.CreateTranslationJsonAsync(request);
             Assert.IsNotNull(response);
         }

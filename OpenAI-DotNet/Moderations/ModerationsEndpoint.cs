@@ -50,8 +50,8 @@ namespace OpenAI.Moderations
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request, CancellationToken cancellationToken = default)
         {
-            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ModerationsResponse>(responseAsString, client);
         }
@@ -102,7 +102,10 @@ namespace OpenAI.Moderations
 
             for (int i = 0; i < input.Length; i += chunkSize - chunkOverlap)
             {
-                var result = await GetModerationAsync(input[i..(i + chunkSize > input.Length ? ^1 : (i + chunkSize))], model, cancellationToken);
+                int i1 = i;
+                int i2 = (i + chunkSize > input.Length ? (input.Length-1) : (i + chunkSize));
+                string subinput = input.Substring(i1, i2-i1+1); // input[i..(i + chunkSize > input.Length ? ^1 : (i + chunkSize))]
+                var result = await GetModerationAsync(subinput, model, cancellationToken);
 
                 if (result)
                 {

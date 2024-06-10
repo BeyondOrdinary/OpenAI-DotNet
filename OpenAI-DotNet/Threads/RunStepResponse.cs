@@ -3,6 +3,7 @@
 using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -74,7 +75,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<RunStepType>))]
+        [JsonConverter(typeof(CustomJsonStringEnumConverter<RunStepType>))]
         public RunStepType Type { get; private set; }
 
         /// <summary>
@@ -82,7 +83,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]
-        [JsonConverter(typeof(JsonStringEnumConverter<RunStatus>))]
+        [JsonConverter(typeof(CustomJsonStringEnumConverter<RunStatus>))]
         public RunStatus Status { get; private set; }
 
         /// <summary>
@@ -256,7 +257,11 @@ namespace OpenAI.Threads
 
             if (other.Metadata is { Count: > 0 })
             {
-                Metadata = new Dictionary<string, string>(other.Metadata);
+                Dictionary<string, string> d = new Dictionary<string, string>();
+                foreach (KeyValuePair<string, string> p in other.Metadata) {
+                    d.Add(p.Key, p.Value);
+                }
+                Metadata = d;
             }
 
             if (other.Usage != null)

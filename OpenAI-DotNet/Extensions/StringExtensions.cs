@@ -23,7 +23,8 @@ namespace OpenAI.Extensions
 
             if (streamData.StartsWith(dataTag))
             {
-                eventData = streamData[dataTag.Length..].Trim();
+                eventData = streamData.Substring(dataTag.Length).Trim();
+                // eventData = streamData[dataTag.Length..].Trim();
             }
 
             const string doneTag = "[DONE]";

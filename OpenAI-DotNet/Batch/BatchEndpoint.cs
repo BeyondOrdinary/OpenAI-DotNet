@@ -27,8 +27,8 @@ namespace OpenAI.Batch
         /// <returns><see cref="BatchResponse"/>.</returns>
         public async Task<BatchResponse> CreateBatchAsync(CreateBatchRequest request, CancellationToken cancellationToken = default)
         {
-            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<BatchResponse>(responseAsString, client);
         }
@@ -41,7 +41,7 @@ namespace OpenAI.Batch
         /// <returns><see cref="ListResponse{BatchResponse}"/>.</returns>
         public async Task<ListResponse<BatchResponse>> ListBatchesAsync(ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<BatchResponse>>(responseAsString, client);
         }
@@ -54,7 +54,7 @@ namespace OpenAI.Batch
         /// <returns><see cref="BatchResponse"/>.</returns>
         public async Task<BatchResponse> RetrieveBatchAsync(string batchId, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl($"/{batchId}"), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl($"/{batchId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<BatchResponse>(responseAsString, client);
         }
@@ -67,7 +67,7 @@ namespace OpenAI.Batch
         /// <returns>True, if the batch was cancelled, otherwise false.</returns>
         public async Task<bool> CancelBatchAsync(string batchId, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.PostAsync(GetUrl($"/{batchId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl($"/{batchId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             var batch = response.Deserialize<BatchResponse>(responseAsString, client);
 

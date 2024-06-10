@@ -13,7 +13,7 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<AnnotationType>))]
+        [JsonConverter(typeof(CustomJsonStringEnumConverter<AnnotationType>))]
         public AnnotationType Type { get; private set; }
 
         /// <summary>

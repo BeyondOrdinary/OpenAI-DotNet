@@ -37,7 +37,7 @@ namespace OpenAI.Models
         /// <returns>Asynchronously returns the list of all <see cref="Model"/>s</returns>
         public async Task<IReadOnlyList<Model>> GetModelsAsync(CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ModelsList>(responseAsString, client)?.Models;
         }
@@ -50,7 +50,7 @@ namespace OpenAI.Models
         /// <returns>Asynchronously returns the <see cref="Model"/> with all available properties</returns>
         public async Task<Model> GetModelDetailsAsync(string id, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl($"/{id}"), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl($"/{id}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<Model>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -75,7 +75,7 @@ namespace OpenAI.Models
 
             try
             {
-                using var response = await client.Client.DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
+                var response = await client.Client.DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
                 var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
                 return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
             }

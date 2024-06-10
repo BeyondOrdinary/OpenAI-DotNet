@@ -67,7 +67,7 @@ namespace OpenAI.Proxy
                             openAIClient.OpenAIClientSettings.BaseRequestUrlFormat,
                             $"{endpoint}{httpContext.Request.QueryString}"
                         ));
-                    using var request = new HttpRequestMessage(method, uri);
+                    var request = new HttpRequestMessage(method, uri);
                     request.Content = new StreamContent(httpContext.Request.Body);
 
                     if (httpContext.Request.ContentType != null)

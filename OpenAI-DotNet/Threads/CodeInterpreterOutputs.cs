@@ -16,7 +16,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<CodeInterpreterOutputType>))]
+        [JsonConverter(typeof(CustomJsonStringEnumConverter<CodeInterpreterOutputType>))]
         public CodeInterpreterOutputType Type { get; private set; }
 
         /// <summary>

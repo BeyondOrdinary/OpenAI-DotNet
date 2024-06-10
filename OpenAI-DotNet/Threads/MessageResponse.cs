@@ -60,7 +60,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]
-        [JsonConverter(typeof(JsonStringEnumConverter<MessageStatus>))]
+        [JsonConverter(typeof(CustomJsonStringEnumConverter<MessageStatus>))]
         public MessageStatus Status { get; private set; }
 
         /// <summary>

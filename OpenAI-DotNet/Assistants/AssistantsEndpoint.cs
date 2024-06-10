@@ -23,7 +23,7 @@ namespace OpenAI.Assistants
         /// <returns><see cref="ListResponse{AssistantResponse}"/>.</returns>
         public async Task<ListResponse<AssistantResponse>> ListAssistantsAsync(ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<AssistantResponse>>(responseAsString, client);
         }
@@ -37,8 +37,8 @@ namespace OpenAI.Assistants
         public async Task<AssistantResponse> CreateAssistantAsync(CreateAssistantRequest request = null, CancellationToken cancellationToken = default)
         {
             request ??= new CreateAssistantRequest();
-            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantResponse>(responseAsString, client);
         }
@@ -51,7 +51,7 @@ namespace OpenAI.Assistants
         /// <returns><see cref="AssistantResponse"/>.</returns>
         public async Task<AssistantResponse> RetrieveAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantResponse>(responseAsString, client);
         }
@@ -65,8 +65,8 @@ namespace OpenAI.Assistants
         /// <returns><see cref="AssistantResponse"/>.</returns>
         public async Task<AssistantResponse> ModifyAssistantAsync(string assistantId, CreateAssistantRequest request, CancellationToken cancellationToken = default)
         {
-            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl($"/{assistantId}"), payload, cancellationToken).ConfigureAwait(false);
+            var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await client.Client.PostAsync(GetUrl($"/{assistantId}"), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantResponse>(responseAsString, client);
         }
@@ -79,7 +79,7 @@ namespace OpenAI.Assistants
         /// <returns>True, if the assistant was deleted.</returns>
         public async Task<bool> DeleteAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.DeleteAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.DeleteAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
         }
@@ -96,7 +96,7 @@ namespace OpenAI.Assistants
         [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public async Task<ListResponse<AssistantFileResponse>> ListFilesAsync(string assistantId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl($"/{assistantId}/files", query), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl($"/{assistantId}/files", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<AssistantFileResponse>>(responseAsString, client);
         }
@@ -119,8 +119,8 @@ namespace OpenAI.Assistants
                 throw new InvalidOperationException($"{nameof(file)}.{nameof(file.Purpose)} must be 'assistants'!");
             }
 
-            using var payload = JsonSerializer.Serialize(new { file_id = file.Id }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl($"/{assistantId}/files"), payload, cancellationToken).ConfigureAwait(false);
+            var payload = JsonSerializer.Serialize(new { file_id = file.Id }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await client.Client.PostAsync(GetUrl($"/{assistantId}/files"), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantFileResponse>(responseAsString, client);
         }
@@ -135,7 +135,7 @@ namespace OpenAI.Assistants
         [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public async Task<AssistantFileResponse> RetrieveFileAsync(string assistantId, string fileId, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantFileResponse>(responseAsString, client);
         }
@@ -155,7 +155,7 @@ namespace OpenAI.Assistants
         [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public async Task<bool> RemoveFileAsync(string assistantId, string fileId, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.DeleteAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.DeleteAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
         }

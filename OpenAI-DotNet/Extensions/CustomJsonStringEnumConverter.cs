@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -12,20 +13,49 @@ namespace OpenAI.Extensions
     /// <summary>
     /// https://github.com/dotnet/runtime/issues/74385#issuecomment-1456725149
     /// </summary>
-    internal sealed class JsonStringEnumConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
+    internal sealed class CustomJsonStringEnumConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
     {
         private readonly JsonNamingPolicy namingPolicy;
         private readonly Dictionary<int, TEnum> numberToEnum = new();
         private readonly Dictionary<TEnum, string> enumToString = new();
         private readonly Dictionary<string, TEnum> stringToEnum = new();
 
-        public JsonStringEnumConverter()
+        public CustomJsonStringEnumConverter()
         {
             // We assume everything from OpenAI is snake case
             namingPolicy = new SnakeCaseNamingPolicy();
             var type = typeof(TEnum);
 
-            foreach (var value in Enum.GetValues<TEnum>())
+            FieldInfo[] fi = typeof(TEnum).GetFields();
+            foreach (FieldInfo field in fi)
+            {
+                if (field.Name.Equals("value__"))
+                {
+                    continue; // skip this one
+                }
+                var attribute = field.GetCustomAttributes(typeof(EnumMemberAttribute), false)
+                    .Cast<EnumMemberAttribute>()
+                    .FirstOrDefault();
+                TEnum tv = (TEnum)Enum.Parse(typeof(TEnum), field.Name);
+                numberToEnum.Add((int)field.GetRawConstantValue(), tv);
+                // The name values might need adjustment for camel case, or other
+                // variants. Need to map them here
+                if (attribute?.Value != null)
+                {
+                    enumToString.Add(tv, attribute.Value);
+                    stringToEnum.Add(attribute.Value, tv);
+                }
+                else
+                {
+                    var convertedName = namingPolicy != null
+                        ? namingPolicy.ConvertName(field.Name)
+                        : field.Name;
+                    enumToString.Add(tv, convertedName);
+                    stringToEnum.Add(convertedName, tv);
+                }
+            }
+            /*
+            foreach (int value in Enum.GetValues(typeof(TEnum)))
             {
                 var enumMember = type.GetMember(value.ToString())[0];
                 var attribute = enumMember.GetCustomAttributes(typeof(EnumMemberAttribute), false)
@@ -33,22 +63,24 @@ namespace OpenAI.Extensions
                     .FirstOrDefault();
                 var index = Convert.ToInt32(type.GetField("value__")?.GetValue(value));
 
+                TEnum vv = (TEnum)Enum.Parse(typeof(TEnum), index.ToString());
                 if (attribute?.Value != null)
                 {
-                    numberToEnum.Add(index, value);
-                    enumToString.Add(value, attribute.Value);
-                    stringToEnum.Add(attribute.Value, value);
+                    numberToEnum.Add(index, vv);
+                    enumToString.Add(vv, attribute.Value);
+                    stringToEnum.Add(attribute.Value, vv);
                 }
                 else
                 {
                     var convertedName = namingPolicy != null
                         ? namingPolicy.ConvertName(value.ToString())
                         : value.ToString();
-                    numberToEnum.Add(index, value);
-                    enumToString.Add(value, convertedName);
-                    stringToEnum.Add(convertedName, value);
+                    numberToEnum.Add(index, vv);
+                    enumToString.Add(vv, convertedName);
+                    stringToEnum.Add(convertedName, vv);
                 }
             }
+            */
         }
 
         public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

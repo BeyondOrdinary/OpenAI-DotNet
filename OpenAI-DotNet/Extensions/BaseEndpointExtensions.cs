@@ -23,13 +23,13 @@ namespace OpenAI.Extensions
         /// </summary>
         public static async Task<HttpResponseMessage> StreamEventsAsync(this OpenAIBaseEndpoint baseEndpoint, string endpoint, StringContent payload, Action<HttpResponseMessage, ServerSentEvent> eventCallback, CancellationToken cancellationToken)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
             request.Content = payload;
             var response = await baseEndpoint.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false); // cancellationToken
             var events = new Stack<ServerSentEvent>();
-            using var reader = new StreamReader(stream);
+            var reader = new StreamReader(stream);
             var isEndOfStream = false;
 
             try
@@ -59,7 +59,12 @@ namespace OpenAI.Extensions
                         Match match = matches[i];
 
                         // If the field type is not provided, treat it as a comment
-                        type = ServerSentEvent.EventMap.GetValueOrDefault(match.Groups[nameof(type)].Value.Trim(), ServerSentEventKind.Comment);
+                        type = ServerSentEventKind.Comment;
+                        string key = match.Groups[nameof(type)].Value.Trim();
+                        if (ServerSentEvent.EventMap.ContainsKey(key))
+                        {
+                            type = ServerSentEvent.EventMap[key];
+                        }
 
                         // The UTF-8 decode algorithm strips one leading UTF-8 Byte Order Mark (BOM), if any.
                         value = match.Groups[nameof(value)].Value.TrimStart(' ');

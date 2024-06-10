@@ -216,10 +216,11 @@ namespace OpenAI
         {
             if (client == null)
             {
-                client = new HttpClient(new SocketsHttpHandler
+                client = new HttpClient();
+                /*new SocketsHttpHandler
                 {
                     PooledConnectionLifetime = TimeSpan.FromMinutes(15)
-                });
+                });*/
             }
             else
             {

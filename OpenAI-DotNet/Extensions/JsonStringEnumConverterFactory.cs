@@ -15,6 +15,6 @@ namespace OpenAI.Extensions
             => typeToConvert.IsEnum;
 
         public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
-            => (JsonConverter)Activator.CreateInstance(typeof(JsonStringEnumConverter<>).MakeGenericType(typeToConvert))!;
+            => (JsonConverter)Activator.CreateInstance(typeof(CustomJsonStringEnumConverter<>).MakeGenericType(typeToConvert))!;
     }
 }

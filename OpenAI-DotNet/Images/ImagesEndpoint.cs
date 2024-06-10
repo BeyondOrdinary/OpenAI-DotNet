@@ -30,8 +30,8 @@ namespace OpenAI.Images
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
-            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/generations"), payload, cancellationToken).ConfigureAwait(false);
+            var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await client.Client.PostAsync(GetUrl("/generations"), payload, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, payload, cancellationToken).ConfigureAwait(false);
         }
 
@@ -43,15 +43,15 @@ namespace OpenAI.Images
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> CreateImageEditAsync(ImageEditRequest request, CancellationToken cancellationToken = default)
         {
-            using var content = new MultipartFormDataContent();
-            using var imageData = new MemoryStream();
-            await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
+            var content = new MultipartFormDataContent();
+            var imageData = new MemoryStream();
+            await request.Image.CopyToAsync(imageData, 80192, cancellationToken).ConfigureAwait(false);
             content.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
 
             if (request.Mask != null)
             {
-                using var maskData = new MemoryStream();
-                await request.Mask.CopyToAsync(maskData, cancellationToken).ConfigureAwait(false);
+                var maskData = new MemoryStream();
+                await request.Mask.CopyToAsync(maskData, 80192, cancellationToken).ConfigureAwait(false);
                 content.Add(new ByteArrayContent(maskData.ToArray()), "mask", request.MaskName);
             }
 
@@ -66,7 +66,7 @@ namespace OpenAI.Images
             }
 
             request.Dispose();
-            using var response = await client.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, content, cancellationToken).ConfigureAwait(false);
         }
 
@@ -78,9 +78,9 @@ namespace OpenAI.Images
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> CreateImageVariationAsync(ImageVariationRequest request, CancellationToken cancellationToken = default)
         {
-            using var content = new MultipartFormDataContent();
-            using var imageData = new MemoryStream();
-            await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
+            var content = new MultipartFormDataContent();
+            var imageData = new MemoryStream();
+            await request.Image.CopyToAsync(imageData, 80912, cancellationToken).ConfigureAwait(false);
             content.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
             content.Add(new StringContent(request.Number.ToString()), "n");
             content.Add(new StringContent(request.Size), "size");
@@ -92,7 +92,7 @@ namespace OpenAI.Images
             }
 
             request.Dispose();
-            using var response = await client.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, content, cancellationToken).ConfigureAwait(false);
         }
 

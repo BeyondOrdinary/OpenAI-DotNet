@@ -34,8 +34,8 @@ namespace OpenAI.Chat
         /// <returns><see cref="ChatResponse"/>.</returns>
         public async Task<ChatResponse> GetCompletionAsync(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
-            using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/completions"), payload, cancellationToken).ConfigureAwait(false);
+            var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await client.Client.PostAsync(GetUrl("/completions"), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ChatResponse>(responseAsString, client);
         }
@@ -58,8 +58,8 @@ namespace OpenAI.Chat
             chatRequest.Stream = true;
             chatRequest.StreamOptions = streamUsage ? new StreamOptions() : null;
             ChatResponse chatResponse = null;
-            using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await this.StreamEventsAsync(GetUrl("/completions"), payload, (sseResponse, ssEvent) =>
+            var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await this.StreamEventsAsync(GetUrl("/completions"), payload, (sseResponse, ssEvent) =>
             {
                 var partialResponse = sseResponse.Deserialize<ChatResponse>(ssEvent, client);
 
@@ -100,19 +100,19 @@ namespace OpenAI.Chat
         {
             chatRequest.Stream = true;
             chatRequest.StreamOptions = streamUsage ? new StreamOptions() : null;
-            using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
+            var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
             request.Content = payload;
-            using var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-            using var reader = new StreamReader(stream);
+            var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var reader = new StreamReader(stream);
             ChatResponse chatResponse = null;
-            using var responseStream = EnableDebug ? new MemoryStream() : null;
+            var responseStream = EnableDebug ? new MemoryStream() : null;
 
             if (responseStream != null)
             {
-                await responseStream.WriteAsync("["u8.ToArray(), cancellationToken);
+                await responseStream.WriteAsync("["u8.ToArray(), 0, 1, cancellationToken);
             }
 
             while (await reader.ReadLineAsync() is { } streamData)
@@ -140,8 +140,8 @@ namespace OpenAI.Chat
                     {
                         data = $"{{{eventData}}}";
                     }
-
-                    await responseStream.WriteAsync(Encoding.UTF8.GetBytes($"{data},"), cancellationToken);
+                    byte[] foo = Encoding.UTF8.GetBytes($"{data},");
+                    await responseStream.WriteAsync(foo,0,foo.Length, cancellationToken);
                 }
 
                 var partialResponse = response.Deserialize<ChatResponse>(eventData, client);
@@ -160,7 +160,7 @@ namespace OpenAI.Chat
 
             if (responseStream != null)
             {
-                await responseStream.WriteAsync("]"u8.ToArray(), cancellationToken);
+                await responseStream.WriteAsync("]"u8.ToArray(),0,1, cancellationToken);
             }
 
             await response.CheckResponseAsync(EnableDebug, payload, responseStream, null, cancellationToken).ConfigureAwait(false);

@@ -86,7 +86,7 @@ public partial class Program
     {
         var auth = OpenAIAuthentication.LoadFromEnv();
         var settings = new OpenAIClientSettings(/* your custom settings if using Azure OpenAI */);
-        using var openAIClient = new OpenAIClient(auth, settings);
+        var openAIClient = new OpenAIClient(auth, settings);
         OpenAIProxyStartup.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
     }
 }

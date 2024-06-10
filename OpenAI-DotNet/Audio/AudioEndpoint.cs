@@ -32,18 +32,18 @@ namespace OpenAI.Audio
         /// <returns><see cref="ReadOnlyMemory{T}"/>.</returns>
         public async Task<ReadOnlyMemory<byte>> CreateSpeechAsync(SpeechRequest request, Func<ReadOnlyMemory<byte>, Task> chunkCallback = null, CancellationToken cancellationToken = default)
         {
-            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/speech"), payload, cancellationToken).ConfigureAwait(false);
+            var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var response = await client.Client.PostAsync(GetUrl("/speech"), payload, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
-            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-            await using var memoryStream = new MemoryStream();
+            var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false); // cancellationToken
+            var memoryStream = new MemoryStream();
             int bytesRead;
             var totalBytesRead = 0;
             var buffer = new byte[8192];
 
-            while ((bytesRead = await responseStream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+            while ((bytesRead = await responseStream.ReadAsync(buffer,0,buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
             {
-                await memoryStream.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, bytesRead), cancellationToken).ConfigureAwait(false);
+                await memoryStream.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
 
                 if (chunkCallback != null)
                 {
@@ -98,9 +98,9 @@ namespace OpenAI.Audio
 
         private async Task<(HttpResponseMessage, string)> Internal_CreateTranscriptionAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
         {
-            using var content = new MultipartFormDataContent();
-            using var audioData = new MemoryStream();
-            await request.Audio.CopyToAsync(audioData, cancellationToken).ConfigureAwait(false);
+            var content = new MultipartFormDataContent();
+            var audioData = new MemoryStream();
+            await request.Audio.CopyToAsync(audioData, 80912, cancellationToken).ConfigureAwait(false);
             content.Add(new ByteArrayContent(audioData.ToArray()), "file", request.AudioName);
             content.Add(new StringContent(request.Model), "model");
 
@@ -131,7 +131,7 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            using var response = await client.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken).ConfigureAwait(false);
             return (response, responseAsString);
         }
@@ -170,9 +170,9 @@ namespace OpenAI.Audio
 
         private async Task<(HttpResponseMessage, string)> Internal_CreateTranslationAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
         {
-            using var content = new MultipartFormDataContent();
-            using var audioData = new MemoryStream();
-            await request.Audio.CopyToAsync(audioData, cancellationToken).ConfigureAwait(false);
+            var content = new MultipartFormDataContent();
+            var audioData = new MemoryStream();
+            await request.Audio.CopyToAsync(audioData,80912, cancellationToken).ConfigureAwait(false);
             content.Add(new ByteArrayContent(audioData.ToArray()), "file", request.AudioName);
             content.Add(new StringContent(request.Model), "model");
 
@@ -190,7 +190,7 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            using var response = await client.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken).ConfigureAwait(false);
             return (response, responseAsString);
         }

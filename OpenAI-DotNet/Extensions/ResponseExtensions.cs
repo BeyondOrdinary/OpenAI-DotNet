@@ -145,10 +145,10 @@ namespace OpenAI.Extensions
 
         internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, bool debugResponse, HttpContent requestContent, MemoryStream responseStream, List<ServerSentEvent> events, CancellationToken cancellationToken, [CallerMemberName] string methodName = null)
         {
-            var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false); // cancellationToken
             var debugMessage = new StringBuilder();
 
-            if (!response.IsSuccessStatusCode || debugResponse)
+            if ((!response.IsSuccessStatusCode && debugResponse) || debugResponse)
             {
                 if (!string.IsNullOrWhiteSpace(methodName))
                 {
@@ -180,7 +180,7 @@ namespace OpenAI.Extensions
                             switch (content)
                             {
                                 case StringContent stringContent:
-                                    var valueAsString = stringContent.ReadAsStringAsync(cancellationToken).Result;
+                                    var valueAsString = stringContent.ReadAsStringAsync().Result; // cancellationToken
                                     object value;
 
                                     try
@@ -201,7 +201,7 @@ namespace OpenAI.Extensions
                     }
                     else
                     {
-                        requestAsString = await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                        requestAsString = await requestContent.ReadAsStringAsync().ConfigureAwait(false); // cancellationToken
                     }
 
                     if (!string.IsNullOrWhiteSpace(requestAsString))
@@ -280,7 +280,7 @@ namespace OpenAI.Extensions
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null, statusCode: response.StatusCode);
+                throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null); // , statusCode: response.StatusCode);
             }
 
             return responseAsString;

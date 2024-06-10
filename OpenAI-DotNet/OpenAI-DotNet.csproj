@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
     <Product>OpenAI-DotNet</Product>
     <Title>OpenAI-DotNet</Title>
     <PackageId>OpenAI-DotNet</PackageId>
@@ -16,8 +16,8 @@ Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
     </Description>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl></RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -25,7 +25,6 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
     <DelaySign>true</DelaySign>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <Version>8.0.1</Version>
@@ -341,6 +340,9 @@ Version 4.4.0
     </PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Extensions\JsonStringEnumConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -353,15 +355,13 @@ Version 4.4.0
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.3" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Assets\OpenAI-DotNet-Icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 </Project>

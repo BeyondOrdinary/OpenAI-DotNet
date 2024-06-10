@@ -30,7 +30,7 @@ namespace OpenAI.VectorStores
             using CancellationTokenSource cts = timeout is < 0
                 ? new CancellationTokenSource()
                 : new CancellationTokenSource(TimeSpan.FromSeconds(timeout ?? 30));
-            using var chainedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
+            var chainedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
             VectorStoreFileBatchResponse result;
             do
             {
