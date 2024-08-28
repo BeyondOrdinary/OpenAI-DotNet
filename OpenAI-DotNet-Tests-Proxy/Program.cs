@@ -17,19 +17,10 @@ namespace OpenAI.Tests.Proxy
 
         private class AuthenticationFilter : AbstractAuthenticationFilter
         {
-            public override void ValidateAuthentication(IHeaderDictionary request)
-            {
-                // You will need to implement your own class to properly test
-                // custom issued tokens you've setup for your end users.
-                if (!request.Authorization.ToString().Contains(TestUserToken))
-                {
-                    throw new AuthenticationException("User is not authorized");
-                }
-            }
-
+            /// <inheritdoc />
             public override async Task ValidateAuthenticationAsync(IHeaderDictionary request)
             {
-                await Task.CompletedTask; // remote resource call
+                await Task.CompletedTask; // remote resource call to verify token
 
                 // You will need to implement your own class to properly test
                 // custom issued tokens you've setup for your end users.
@@ -45,7 +36,7 @@ namespace OpenAI.Tests.Proxy
             var auth = OpenAIAuthentication.LoadFromEnv();
             var settings = new OpenAIClientSettings(/* your custom settings if using Azure OpenAI */);
             var openAIClient = new OpenAIClient(auth, settings);
-            OpenAIProxyStartup.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
+            OpenAIProxy.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
         }
     }
 }

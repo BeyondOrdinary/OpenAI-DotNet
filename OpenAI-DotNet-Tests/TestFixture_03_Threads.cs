@@ -4,6 +4,7 @@ using NUnit.Framework;
 using OpenAI.Assistants;
 using OpenAI.Files;
 using OpenAI.Models;
+using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
 using OpenAI.Threads;
 using System;
@@ -257,7 +258,7 @@ namespace OpenAI.Tests
                 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
                 Assert.NotNull(message);
 
-                var run = await thread.CreateRunAsync(assistant, streamEvent =>
+                var run = await thread.CreateRunAsync(assistant, async streamEvent =>
                 {
                     Console.WriteLine(streamEvent.ToJsonString());
 
@@ -300,11 +301,9 @@ namespace OpenAI.Tests
                         case Error errorEvent:
                             Assert.NotNull(errorEvent);
                             break;
-                        //default:
-                            // handle event not already processed by library
-                            // var @event = JsonSerializer.Deserialize<T>(streamEvent.ToJsonString());
-                            //break;
                     }
+
+                    await Task.CompletedTask;
                 });
 
                 Assert.IsNotNull(run);
@@ -343,7 +342,7 @@ namespace OpenAI.Tests
 
             try
             {
-                async void StreamEventHandler(IServerSentEvent streamEvent)
+                async Task StreamEventHandler(IServerSentEvent streamEvent)
                 {
                     try
                     {
@@ -469,9 +468,10 @@ namespace OpenAI.Tests
             try
             {
                 var run = await assistant.CreateThreadAndRunAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?",
-                    @event =>
+                    async @event =>
                     {
                         Console.WriteLine(@event.ToJsonString());
+                        await Task.CompletedTask;
                     });
                 Assert.IsNotNull(run);
                 thread = await run.GetThreadAsync();
@@ -500,7 +500,76 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_04_03_CreateThreadAndRun_SubmitToolOutput()
+        public async Task Test_04_03_CreateThreadAndRun_Streaming_ToolCalls()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+
+            var tools = new List<Tool>
+            {
+                Tool.GetOrCreateTool(typeof(DateTimeUtility), nameof(DateTimeUtility.GetDateTime))
+            };
+            var assistantRequest = new CreateAssistantRequest(
+                instructions: "You are a helpful assistant.",
+                tools: tools);
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
+            Assert.IsNotNull(assistant);
+            ThreadResponse thread = null;
+            // check if any exceptions thrown in stream event handler
+            var exceptionThrown = false;
+
+            try
+            {
+                async Task StreamEventHandler(IServerSentEvent streamEvent)
+                {
+                    Console.WriteLine($"{streamEvent.ToJsonString()}");
+
+                    try
+                    {
+                        switch (streamEvent)
+                        {
+                            case ThreadResponse threadResponse:
+                                thread = threadResponse;
+                                break;
+                            case RunResponse runResponse:
+                                if (runResponse.Status == RunStatus.RequiresAction)
+                                {
+                                    var toolOutputs = await assistant.GetToolOutputsAsync(runResponse);
+                                    var toolRun = await runResponse.SubmitToolOutputsAsync(toolOutputs, StreamEventHandler);
+                                    Assert.NotNull(toolRun);
+                                    Assert.IsTrue(toolRun.Status == RunStatus.Completed);
+                                }
+                                break;
+                            case Error errorResponse:
+                                throw errorResponse.Exception ?? new Exception(errorResponse.Message);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        exceptionThrown = true;
+                    }
+                }
+
+                var run = await assistant.CreateThreadAndRunAsync("What date is it?", StreamEventHandler);
+                Assert.NotNull(thread);
+                Assert.IsNotNull(run);
+                Assert.IsFalse(exceptionThrown);
+                Assert.IsTrue(run.Status == RunStatus.Completed);
+            }
+            finally
+            {
+                await assistant.DeleteAsync(deleteToolResources: thread == null);
+
+                if (thread != null)
+                {
+                    var isDeleted = await thread.DeleteAsync(deleteToolResources: true);
+                    Assert.IsTrue(isDeleted);
+                }
+            }
+        }
+
+        [Test]
+        public async Task Test_04_04_CreateThreadAndRun_SubmitToolOutput()
         {
             var tools = new List<Tool>
             {
@@ -586,6 +655,94 @@ namespace OpenAI.Tests
                     Assert.IsNotNull(message);
                     Assert.IsNotEmpty(message.Content);
                     Console.WriteLine($"{message.Role}: {message.PrintContent()}");
+                }
+            }
+            finally
+            {
+                await assistant.DeleteAsync(deleteToolResources: thread == null);
+
+                if (thread != null)
+                {
+                    var isDeleted = await thread.DeleteAsync(deleteToolResources: true);
+                    Assert.IsTrue(isDeleted);
+                }
+            }
+        }
+
+        [Test]
+        public async Task Test_05_01_CreateThreadAndRun_StructuredOutputs_Streaming()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync<MathResponse>(
+                new CreateAssistantRequest(
+                    name: "Math Tutor",
+                    instructions: "You are a helpful math tutor. Guide the user through the solution step by step.",
+                    model: "gpt-4o-2024-08-06"));
+            Assert.NotNull(assistant);
+            ThreadResponse thread = null;
+            // check if any exceptions thrown in stream event handler
+            var exceptionThrown = false;
+
+            try
+            {
+                async Task StreamEventHandler(IServerSentEvent @event)
+                {
+                    try
+                    {
+                        switch (@event)
+                        {
+                            case MessageResponse message:
+                                if (message.Status != MessageStatus.Completed)
+                                {
+                                    Console.WriteLine(@event.ToJsonString());
+                                    break;
+                                }
+
+                                var mathResponse = message.FromSchema<MathResponse>();
+                                Assert.IsNotNull(mathResponse);
+                                Assert.IsNotNull(mathResponse.Steps);
+                                Assert.IsNotEmpty(mathResponse.Steps);
+
+                                for (var i = 0; i < mathResponse.Steps.Count; i++)
+                                {
+                                    var step = mathResponse.Steps[i];
+                                    Assert.IsNotNull(step.Explanation);
+                                    Console.WriteLine($"Step {i}: {step.Explanation}");
+                                    Assert.IsNotNull(step.Output);
+                                    Console.WriteLine($"Result: {step.Output}");
+                                }
+
+                                Assert.IsNotNull(mathResponse.FinalAnswer);
+                                Console.WriteLine($"Final Answer: {mathResponse.FinalAnswer}");
+                                break;
+                            default:
+                                Console.WriteLine(@event.ToJsonString());
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        exceptionThrown = true;
+                        throw;
+                    }
+
+                    await Task.CompletedTask;
+                }
+
+                var run = await assistant.CreateThreadAndRunAsync("how can I solve 8x + 7 = -23", StreamEventHandler);
+                Assert.IsNotNull(run);
+                Assert.IsFalse(exceptionThrown);
+                thread = await run.GetThreadAsync();
+                run = await run.WaitForStatusChangeAsync();
+                Assert.IsNotNull(run);
+                Assert.IsTrue(run.Status == RunStatus.Completed);
+                Assert.NotNull(thread);
+                var messages = await thread.ListMessagesAsync();
+
+                foreach (var response in messages.Items.OrderBy(response => response.CreatedAt))
+                {
+                    Console.WriteLine($"{response.Role}: {response.PrintContent()}");
                 }
             }
             finally

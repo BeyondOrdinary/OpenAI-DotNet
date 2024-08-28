@@ -192,11 +192,11 @@ namespace OpenAI.Threads
         {
             if (other == null) { return; }
 
-            if (!string.IsNullOrWhiteSpace(Id))
+            if (!string.IsNullOrWhiteSpace(Id) && !string.IsNullOrWhiteSpace(other.Id))
             {
                 if (Id != other.Id)
                 {
-                    throw new InvalidOperationException("Attempting to append a different object than the original!");
+                    throw new InvalidOperationException($"Attempting to append a different object than the original! {Id} != {other.Id}");
                 }
             }
             else

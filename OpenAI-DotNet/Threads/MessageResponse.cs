@@ -4,6 +4,7 @@ using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -177,15 +178,27 @@ namespace OpenAI.Threads
                 ? string.Empty
                 : string.Join("\n", content.Select(c => c?.ToString()));
 
+        /// <summary>
+        /// Converts the <see cref="Content"/> to the specified <see cref="JsonSchema"/>.
+        /// </summary>
+        /// <typeparam name="T"><see cref="JsonSchema"/> to used for structured outputs.</typeparam>
+        /// <param name="options"><see cref="JsonSerializerOptions"/>.</param>
+        /// <returns>Deserialized <see cref="JsonSchema"/> object.</returns>
+        public T FromSchema<T>(JsonSerializerOptions options = null)
+        {
+            options ??= OpenAIClient.JsonSerializationOptions;
+            return JsonSerializer.Deserialize<T>(PrintContent(), options);
+        }
+
         internal void AppendFrom(MessageResponse other)
         {
             if (other == null) { return; }
 
-            if (!string.IsNullOrWhiteSpace(Id))
+            if (!string.IsNullOrWhiteSpace(Id) && !string.IsNullOrWhiteSpace(other.Id))
             {
                 if (Id != other.Id)
                 {
-                    throw new InvalidOperationException("Attempting to append a different object than the original!");
+                    throw new InvalidOperationException($"Attempting to append a different object than the original! {Id} != {other.Id}");
                 }
             }
             else

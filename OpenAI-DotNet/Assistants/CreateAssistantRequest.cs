@@ -1,10 +1,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using OpenAI.Extensions;
 
 namespace OpenAI.Assistants
 {
@@ -56,14 +56,18 @@ namespace OpenAI.Assistants
         /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
         /// We generally recommend altering this or temperature but not both.
         /// </param>
+        /// <param name="jsonSchema">
+        /// The <see cref="JsonSchema"/> to use for structured JSON outputs.<br/>
+        /// <see href="https://platform.openai.com/docs/guides/structured-outputs"/><br/>
+        /// <see href="https://json-schema.org/overview/what-is-jsonschema"/>
+        /// </param>
         /// <param name="responseFormat">
         /// Specifies the format that the model must output.
         /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.<br/>
-        /// Important: When using JSON mode you must still instruct the model to produce JSON yourself via some conversation message,
-        /// for example via your system message. If you don't do this, the model may generate an unending stream of
-        /// whitespace until the generation reaches the token limit, which may take a lot of time and give the appearance
-        /// of a "stuck" request. Also note that the message content may be partial (i.e. cut off) if finish_reason="length",
+        /// Important: When using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message.
+        /// Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit,
+        /// resulting in a long-running and seemingly "stuck" request. Also note that the message content may be partially cut off if finish_reason="length",
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </param>
         public CreateAssistantRequest(
@@ -77,7 +81,8 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ChatResponseFormat? responseFormat = null)
+            JsonSchema jsonSchema = null,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
         : this(
             string.IsNullOrWhiteSpace(model) ? assistant.Model : model,
             string.IsNullOrWhiteSpace(name) ? assistant.Name : name,
@@ -88,20 +93,8 @@ namespace OpenAI.Assistants
             metadata ?? assistant.Metadata,
             temperature ?? assistant.Temperature,
             topP ?? assistant.TopP,
-            responseFormat ?? assistant.ResponseFormat)
-        {
-        }
-
-        [Obsolete("use new .ctr")]
-        public CreateAssistantRequest(
-            AssistantResponse assistant,
-            string model,
-            string name,
-            string description,
-            string instructions,
-            IEnumerable<Tool> tools,
-            IEnumerable<string> files,
-            IReadOnlyDictionary<string, string> metadata)
+            jsonSchema,
+            responseFormat)
         {
         }
 
@@ -150,14 +143,18 @@ namespace OpenAI.Assistants
         /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
         /// We generally recommend altering this or temperature but not both.
         /// </param>
+        /// <param name="jsonSchema">
+        /// The <see cref="JsonSchema"/> to use for structured JSON outputs.<br/>
+        /// <see href="https://platform.openai.com/docs/guides/structured-outputs"/><br/>
+        /// <see href="https://json-schema.org/overview/what-is-jsonschema"/>
+        /// </param>
         /// <param name="responseFormat">
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> or <see cref="ChatResponseFormat.JsonSchema"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.<br/>
-        /// Important: When using JSON mode you must still instruct the model to produce JSON yourself via some conversation message,
-        /// for example via your system message. If you don't do this, the model may generate an unending stream of
-        /// whitespace until the generation reaches the token limit, which may take a lot of time and give the appearance
-        /// of a "stuck" request. Also note that the message content may be partial (i.e. cut off) if finish_reason="length",
+        /// Important: When using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message.
+        /// Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit,
+        /// resulting in a long-running and seemingly "stuck" request. Also note that the message content may be partially cut off if finish_reason="length",
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </param>
         public CreateAssistantRequest(
@@ -170,7 +167,8 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Auto)
+            JsonSchema jsonSchema = null,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT4o : model;
             Name = name;
@@ -247,14 +245,13 @@ namespace OpenAI.Assistants
 
         /// <summary>
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> or <see cref="ChatResponseFormat.JsonSchema"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.
         /// </summary>
         /// <remarks>
-        /// Important: When using JSON mode you must still instruct the model to produce JSON yourself via some conversation message,
-        /// for example via your system message. If you don't do this, the model may generate an unending stream of
-        /// whitespace until the generation reaches the token limit, which may take a lot of time and give the appearance
-        /// of a "stuck" request. Also note that the message content may be partial (i.e. cut off) if finish_reason="length",
+        /// Important: When using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message.
+        /// Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit,
+        /// resulting in a long-running and seemingly "stuck" request. Also note that the message content may be partially cut off if finish_reason="length",
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
