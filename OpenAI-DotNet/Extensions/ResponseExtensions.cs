@@ -293,7 +293,7 @@ namespace OpenAI.Extensions
             {
                 var result = JsonSerializer.Deserialize<T>(json, OpenAIClient.JsonSerializationOptions);
                 result.SetResponseData(response.Headers, client);
-                Console.WriteLine($"Parsed {typeof(T).Name} -> {json}");
+                //  Console.WriteLine($"Parsed {typeof(T).Name} -> {json}");
                 return result;
             }
             catch (Exception x)
