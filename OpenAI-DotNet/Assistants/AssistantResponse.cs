@@ -1,9 +1,9 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using OpenAI.Extensions;
 
 namespace OpenAI.Assistants
 {
@@ -137,8 +137,12 @@ namespace OpenAI.Assistants
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("response_format")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        public ChatResponseFormat ResponseFormat { get; private set; }
+        public ResponseFormatObject ResponseFormatObject { get; private set; }
+
+        [JsonIgnore]
+        public ChatResponseFormat ResponseFormat => ResponseFormatObject ?? ChatResponseFormat.Auto;
 
         public static implicit operator string(AssistantResponse assistant) => assistant?.Id;
 

@@ -289,9 +289,18 @@ namespace OpenAI.Extensions
         internal static T Deserialize<T>(this HttpResponseMessage response, string json, OpenAIClient client)
             where T : BaseResponse
         {
-            var result = JsonSerializer.Deserialize<T>(json, OpenAIClient.JsonSerializationOptions);
-            result.SetResponseData(response.Headers, client);
-            return result;
+            try
+            {
+                var result = JsonSerializer.Deserialize<T>(json, OpenAIClient.JsonSerializationOptions);
+                result.SetResponseData(response.Headers, client);
+                Console.WriteLine($"Parsed {typeof(T).Name} -> {json}");
+                return result;
+            }
+            catch (Exception x)
+            {
+                Console.WriteLine($"Failed to parse {typeof(T).Name} -> {json}\n{x}");
+                throw;
+            }
         }
 
         internal static T Deserialize<T>(this HttpResponseMessage response, ServerSentEvent ssEvent, OpenAIClient client)

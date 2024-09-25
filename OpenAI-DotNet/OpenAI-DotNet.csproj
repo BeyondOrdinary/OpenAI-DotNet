@@ -28,8 +28,21 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <SignAssembly>false</SignAssembly>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.2.2</Version>
+    <Version>8.3.0</Version>
     <PackageReleaseNotes>
+Version 8.3.0
+- Updated library to .net 8
+- Refactored TypeExtensions and JsonSchema generation
+  - Improved JsonSchema generation for enums and dictionaries
+  - Ensured JsonSchema properly handles nullable types
+- Ensure that function args are not re-serialized and passed back into tool function for future calls
+Version 8.2.5
+- Fixed ResponseObjectFormat deserialization when maxNumberOfResults is null
+Version 8.2.4
+- Fixed ResponseObjectFormat deserialization when set to auto
+- Added RankingOptions to FileSearchOptions
+- Fixed potential memory leaks when uploading files to various endpoints
+- Added timestamp values to BaseResponse to calculate rate limits
 Version 8.2.2
 - Added generic parameters to methods that support structured output
 Version 8.2.1

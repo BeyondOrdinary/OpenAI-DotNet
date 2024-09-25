@@ -1,10 +1,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
+using OpenAI.Extensions;
 
 namespace OpenAI.Threads
 {

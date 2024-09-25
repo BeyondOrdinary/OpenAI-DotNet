@@ -4,37 +4,44 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Extensions
+namespace OpenAI
 {
-    internal sealed class ResponseFormatConverter : JsonConverter<ChatResponseFormat>
+    // New Version
+    public sealed class xxResponseFormatObject
     {
-        private class ResponseFormatObject
+        public xxResponseFormatObject() { }
+
+        public xxResponseFormatObject(ChatResponseFormat type)
         {
-            public ResponseFormatObject(ChatResponseFormat type)
+            if (type == ChatResponseFormat.JsonSchema)
             {
-                if (type == ChatResponseFormat.JsonSchema)
-                {
-                    throw new System.ArgumentException("Use the constructor overload that accepts a JsonSchema object for ChatResponseFormat.JsonSchema.", nameof(type));
-                }
-                Type = type;
+                throw new System.ArgumentException("Use the constructor overload that accepts a JsonSchema object for ChatResponseFormat.JsonSchema.", nameof(type));
             }
-
-            [JsonInclude]
-            [JsonPropertyName("type")]
-            [JsonConverter(typeof(CustomJsonStringEnumConverter<ChatResponseFormat>))]
-            public ChatResponseFormat Type { get; private set; }
-
-            [JsonInclude]
-            [JsonPropertyName("json_schema")]
-            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-            public JsonSchema JsonSchema { get; private set; }
-
-            public static implicit operator ResponseFormatObject(ChatResponseFormat type) => new(type);
-
-            public static implicit operator ChatResponseFormat(ResponseFormatObject format) => format.Type;
+            Type = type;
         }
 
-        public override ChatResponseFormat Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        [JsonInclude]
+        [JsonPropertyName("type")]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ChatResponseFormat>))]
+        public ChatResponseFormat Type { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("json_schema")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public JsonSchema JsonSchema { get; private set; }
+
+        public static implicit operator xxResponseFormatObject(ChatResponseFormat type) => new(type);
+
+        public static implicit operator ChatResponseFormat(xxResponseFormatObject format) => format.Type;
+    }
+}
+
+namespace OpenAI.Extensions
+{
+
+    internal sealed class ResponseFormatConverter : JsonConverter<ResponseFormatObject>
+    {
+        public override ResponseFormatObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             try
             {
@@ -51,31 +58,10 @@ namespace OpenAI.Extensions
             }
         }
 
-        public override void Write(Utf8JsonWriter writer, ChatResponseFormat value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ResponseFormatObject value, JsonSerializerOptions options)
         {
-            const string type = nameof(type);
-            const string text = nameof(text);
-            // ReSharper disable once InconsistentNaming
-            const string json_object = nameof(json_object);
-
-            switch (value)
-            {
-                case ChatResponseFormat.Auto:
-                    writer.WriteNullValue();
-                    break;
-                case ChatResponseFormat.Text:
-                    writer.WriteStartObject();
-                    writer.WriteString(type, text);
-                    writer.WriteEndObject();
-                    break;
-                case ChatResponseFormat.Json:
-                    writer.WriteStartObject();
-                    writer.WriteString(type, json_object);
-                    writer.WriteEndObject();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
+            // serialize the object normally
+            JsonSerializer.Serialize(writer, value, options);
         }
     }
 }

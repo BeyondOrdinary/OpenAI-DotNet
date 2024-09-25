@@ -1,11 +1,11 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using OpenAI.Extensions;
 
 namespace OpenAI.Chat
 {
@@ -36,7 +36,7 @@ namespace OpenAI.Chat
         {
             var toolList = tools?.ToList();
 
-            if (toolList != null && toolList.Any())
+            if (toolList is { Count: > 0 })
             {
                 if (string.IsNullOrWhiteSpace(toolChoice))
                 {
@@ -55,6 +55,15 @@ namespace OpenAI.Chat
                     else
                     {
                         ToolChoice = toolChoice;
+                    }
+                }
+
+                foreach (var tool in toolList)
+                {
+                    if (tool?.Function?.Arguments != null)
+                    {
+                        // just in case clear any lingering func args.
+                        tool.Function.Arguments = null;
                     }
                 }
             }
@@ -270,7 +279,6 @@ namespace OpenAI.Chat
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(ResponseFormatConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ChatResponseFormat ResponseFormat { get; }
 

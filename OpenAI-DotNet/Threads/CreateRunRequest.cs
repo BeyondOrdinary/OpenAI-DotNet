@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -146,7 +147,7 @@ namespace OpenAI.Threads
 
             var toolList = tools?.ToList();
 
-            if (toolList != null && toolList.Any())
+            if (toolList is { Count: > 0 })
             {
                 if (string.IsNullOrWhiteSpace(toolChoice))
                 {
@@ -165,6 +166,15 @@ namespace OpenAI.Threads
                     else
                     {
                         ToolChoice = toolChoice;
+                    }
+                }
+
+                foreach (var tool in toolList)
+                {
+                    if (tool?.Function?.Arguments != null)
+                    {
+                        // just in case clear any lingering func args.
+                        tool.Function.Arguments = null;
                     }
                 }
             }

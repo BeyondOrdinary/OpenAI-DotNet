@@ -1,10 +1,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-using OpenAI.Extensions;
 
 namespace OpenAI.Assistants
 {
@@ -255,7 +255,6 @@ namespace OpenAI.Assistants
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(ResponseFormatConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ChatResponseFormat ResponseFormat { get; }
 
